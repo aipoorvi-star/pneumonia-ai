@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pneumonia Detection AI</title>
+</head>
+
+<body style="text-align:center; font-family:Arial; background:#f5f5f5;">
+
+    <h1>🩺Pneumonia Detection AI</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <br><br>
+        <button type="submit">Upload & Predict</button>
+    </form>
+
+    {% if result %}
+        <h2 style="margin-top:20px;">{{ result }}</h2>
+
+        <h3>Uploaded Image:</h3>
+        <img src="{{ url_for('static', filename=image_path) }}" width="350">
+    {% endif %}
+
+</body>
+</html>
