@@ -1,52 +1,54 @@
 from flask import Flask, render_template, request
+import os
+import uuid
 import random
 from PIL import Image
-import os
 
 app = Flask(__name__)
 
-# Upload folder
+# folder setup
 UPLOAD_FOLDER = "static/uploads"
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Ensure folder exists
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-
-@app.route('/')
+# home
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
 
-
-@app.route('/predict', methods=['POST'])
+# predict
+@app.route("/predict", methods=["POST"])
 def predict():
+    file = request.files.get("file")
+
+    if file is None or file.filename == "":
+        return "No file uploaded"
+
+    # unique filename
+    filename = str(uuid.uuid4()) + ".jpg"
+    filepath = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+
+    # save file
+    file.save(filepath)
+
+    # verify image (prevents crash)
     try:
-        file = request.files.get('file')
+        img = Image.open(filepath)
+        img.verify()
+    except:
+        return "Invalid image file"
 
-        if not file:
-            return "No file uploaded"
+    # fake result
+    result = random.choice(["PNEUMONIA", "NORMAL"])
+    confidence = random.randint(85, 98)
 
-        # Save image
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        file.save(file_path)
+    return render_template(
+        "result.html",
+        result=result,
+        confidence=confidence,
+        image_path="uploads/" + filename
+    )
 
-        # Open safely
-        img = Image.open(file_path)
-
-        # Fake AI result
-        result = random.choice(["PNEUMONIA", "NORMAL"])
-        confidence = random.randint(85, 98)
-
-        return render_template(
-            'result.html',
-            result=result,
-            confidence=confidence,
-            image_path="uploads/" + file.filename
-        )
-
-    except Exception as e:
-        return f"Error: {str(e)}"
-
-
+# run
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
