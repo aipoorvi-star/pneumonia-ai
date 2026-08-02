@@ -1,0 +1,7 @@
+flask
+gunicorn
+numpy
+pillow
+opencv-python-headless
+keras
+h5py
