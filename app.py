@@ -2,7 +2,7 @@ import os
 import numpy as np
 import cv2
 from flask import Flask, render_template, request
-from tensorflow.keras.models import load_model
+from keras.models import load_model
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
